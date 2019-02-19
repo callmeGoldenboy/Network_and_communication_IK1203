@@ -4,7 +4,6 @@ import java.io.*;
 public class HTTPEcho {
     public static void main( String[] args) {
         int port;
-		    String hello = "Hello";
         String lineRequest = "";
         String wholeRequest = "";
 
@@ -21,23 +20,17 @@ public class HTTPEcho {
           while(true){
            try(Socket cSocket = serversocket.accept()){
              BufferedReader fromClient = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
-             lineRequest = fromClient.readLine() + "\n";
-             while(lineRequest.length() >2){
-               wholeRequest += lineRequest;
-               lineRequest = fromClient.readLine() + "\n";
+             lineRequest = fromClient.readLine();
+
+             while(lineRequest.length() != 0){
+               wholeRequest += lineRequest + '\n';
+               lineRequest = fromClient.readLine();
              }
-             //String response =  " HTTP/1.1 200 OK " + "\n" +"Content-Type: text/html\r\n\r\n" + wholeRequest;
-             String response =  " HTTP/1.1 200 OK \r\n\r\n" + wholeRequest;
-             //String header = " HTTP/1.1 200 OK " + "\n" +"Content-Type: text/html\r\n\r\n";
+
+             String response =  "HTTP/1.1 200 OK \r\n\r\n" + wholeRequest;
+
              cSocket.getOutputStream().write(response.getBytes("UTF-8"));
-            /* cSocket.getOutputStream().write(header.getBytes("UTF-8"));
-             File file = new File("C:\\Users\\Natan\\Desktop\\task2\\response.html");
-				    int fileLength = (int) file.length();
-			      String contentMimeType = "text/html";
-				//read content to return to client
-				   byte[] fileData = readFileData(file, fileLength);
-           cSocket.getOutputStream().write(file,0,fileLength);
-              */
+
              wholeRequest = "";
 
            }
