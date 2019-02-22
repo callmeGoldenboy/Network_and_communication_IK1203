@@ -8,12 +8,12 @@ import java.util.Set;
 public class HTTPAsk {
     public static void main( String[] args) throws MalformedURLException {
       int port;
-
       String request="";
       String targetHost ="";
-      String [] params = null;
-      String [] params2 = null;
-      String [] params3 = null;
+      int targetPort = 0;
+      String query = "";
+      String value ="";
+      String targetString = "";
       try{
         port = Integer.parseInt(args[0]);
 
@@ -27,34 +27,32 @@ public class HTTPAsk {
       while(true){
         try(Socket cSocket = serversocket.accept()){
           BufferedReader fromClient = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
-          request = fromClient.readLine();          
+          request = fromClient.readLine();
           StringTokenizer tokenizer = new StringTokenizer(request);
-          String method = tokenizer.nextToken().toUpperCase();
-          String url = "http://localhost:8888" + tokenizer.nextToken().toLowerCase();
-          //String url = "http://localhost:8888" + request.substring(4).toLowerCase();
+          String method = tokenizer.nextToken();
+          String url = "http://localhost:" + port + tokenizer.nextToken().toLowerCase();
           URL myUrl = new URL (url);
-          //System.out.println(request);
-          String query = myUrl.getQuery();
-          /*Map<String, String> map = getQueryMap(query);
-          Set<String> keys = map.keySet();
-          String targetHost = map.get("hostname");
-          int targetPort = Integer.parseInt(map.get("port"));
-          String value = TCPClient.askServer(targetHost,targetPort);*/
-          if(query != null){
-           params = query.split("&");
-           params2 = params[0].split("=");
-           params3 = params[1].split("=");
-           targetHost = params2 [1];
-        }else{
-          System.out.println("query is empty");
+          if(myUrl.getPath().substring(1).equals("ask") && method.equals("GET")){
+          query = myUrl.getQuery();
+          Map<String, String> map = getQueryMap(query);
+          targetHost = map.get("hostname");
+          targetPort = Integer.parseInt(map.get("port"));
+          targetString = map.get("string");
+          if(targetString != null){
+            value = TCPClient.askServer(targetHost,targetPort,targetString);
+        }else {
+            value = TCPClient.askServer(targetHost,targetPort);
         }
-          int targetPort = Integer.parseInt(params3[1]);
-          String value = TCPClient.askServer(targetHost,targetPort);
-          String response =  "HTTP/1.1 200 OK \r\n\r\n" + value;
+          String response =  "\nHTTP/1.1 200 OK \r\n\r\n" + value;
+          System.out.println(response);
           cSocket.getOutputStream().write(response.getBytes("UTF-8"));
           fromClient.close();
+        }else {
+          String response = "\nHTTP/1.1 400 BAD REQUEST\r\n\r\n";
+          cSocket.getOutputStream().write(response.getBytes("UTF-8"));
         }
-      }
+      }// end of try that closes the socket
+      }///end forever loop
     }catch(IOException ex){
           System.out.println(ex);
         }
@@ -62,11 +60,11 @@ public class HTTPAsk {
       }///end of main
 
 
+  //helper function that returns a HashMap of key and values where keys are the string before = and values are the string after =
   public static Map<String, String> getQueryMap(String query){
    String[] params = query.split("&");
    Map<String, String> map = new HashMap<String, String>();
-   for (String param : params)
-   {
+   for (String param : params){
        String name = param.split("=")[0];
        String value = param.split("=")[1];
        map.put(name, value);
