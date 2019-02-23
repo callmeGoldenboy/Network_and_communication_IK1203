@@ -25,19 +25,24 @@ public class HTTPAsk {
         ServerSocket serversocket = new ServerSocket(port);
         System.out.println("Listening for connection on port " + port + "...");
       while(true){
-        try(Socket cSocket = serversocket.accept()){
+        try( Socket cSocket = serversocket.accept()){
           BufferedReader fromClient = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
           request = fromClient.readLine();
-          StringTokenizer tokenizer = new StringTokenizer(request);
-          String method = tokenizer.nextToken();
-          String url = "http://localhost:" + port + tokenizer.nextToken().toLowerCase();
+          System.out.println(request);
+          /*StringTokenizer tokenizer = new StringTokenizer(request);
+          String method = tokenizer.nextToken().toUpperCase();
+          String url = "http://localhost:" + port + tokenizer.nextToken().toLowerCase();*/
+          String [] split = request.split(" ");
+          String method = split[0];
+          String url = "http://localhost:" + port + split[1].toLowerCase();
           URL myUrl = new URL (url);
-          if(myUrl.getPath().substring(1).equals("ask") && method.equals("GET")){
+          if(myUrl.getPath().equals("/ask") && method.equals("GET")){
           query = myUrl.getQuery();
           Map<String, String> map = getQueryMap(query);
           targetHost = map.get("hostname");
           targetPort = Integer.parseInt(map.get("port"));
           targetString = map.get("string");
+
           if(targetString != null){
             value = TCPClient.askServer(targetHost,targetPort,targetString);
         }else {
@@ -46,12 +51,16 @@ public class HTTPAsk {
           String response =  "\nHTTP/1.1 200 OK \r\n\r\n" + value;
           System.out.println(response);
           cSocket.getOutputStream().write(response.getBytes("UTF-8"));
-          fromClient.close();
-        }else {
+
+        } // if statment to checkk if ask and get match
+        else {
           String response = "\nHTTP/1.1 400 BAD REQUEST\r\n\r\n";
           cSocket.getOutputStream().write(response.getBytes("UTF-8"));
         }
-      }// end of try that closes the socket
+
+        fromClient.close();
+        cSocket.close();
+      }   // end of try that closes the socket
       }///end forever loop
     }catch(IOException ex){
           System.out.println(ex);
