@@ -1,6 +1,5 @@
 import java.net.*;
 import java.io.*;
-import java.util.StringTokenizer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -62,13 +61,14 @@ public class HTTPAsk {
         }
 
         //fromClient.close();
-        cSocket.close();
+
       }catch(Exception ex){
         //if the TCPClient returns an exception
         String response = "\nHTTP/1.1 404 NOT FOUND\r\n\r\n" + "\nHTTP/1.1 404 NOT FOUND";
         cSocket.getOutputStream().write(response.getBytes("UTF-8"));
       }
       }   // end of try that closes the socket
+      
       }///end forever loop
     }catch(Exception ex){
           System.out.println(ex);

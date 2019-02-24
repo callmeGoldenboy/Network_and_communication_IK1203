@@ -1,4 +1,3 @@
-
 import java.net.*;
 import java.io.*;
 import java.lang.*;
@@ -39,7 +38,7 @@ public class TCPClient {
 		long start = System.currentTimeMillis();
 		long current = System.currentTimeMillis();
         try {
-    	while((c = infromServer.read())!=-1 && (current - start) < 1000){
+    	while((c = infromServer.read())!=-1 && (current - start) < 3000){
     		fromServer += (char)c;
 			current = System.currentTimeMillis();
 
