@@ -1,9 +1,5 @@
 import java.net.*;
 import java.io.*;
-import java.util.StringTokenizer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class ConcHTTPAsk {
   public static void main( String[] args) throws MalformedURLException {
