@@ -9,6 +9,7 @@ public class HTTPAsk {
     public static void main( String[] args) throws MalformedURLException {
       int port;
       String request="";
+      String line = "";
       String targetHost ="";
       int targetPort = 0;
       String query = "";
@@ -28,14 +29,16 @@ public class HTTPAsk {
         try( Socket cSocket = serversocket.accept()){
           BufferedReader fromClient = new BufferedReader(new InputStreamReader(cSocket.getInputStream()));
           request = fromClient.readLine();
-          System.out.println(request);
-          /*StringTokenizer tokenizer = new StringTokenizer(request);
-          String method = tokenizer.nextToken().toUpperCase();
-          String url = "http://localhost:" + port + tokenizer.nextToken().toLowerCase();*/
+          //System.out.println(request);
+          line = fromClient.readLine();
+          while(line.length()!= 0){
+            line = fromClient.readLine();
+          }
           String [] split = request.split(" ");
           String method = split[0];
           String url = "http://localhost:" + port + split[1].toLowerCase();
           URL myUrl = new URL (url);
+          try{
           if(myUrl.getPath().equals("/ask") && method.equals("GET")){
           query = myUrl.getQuery();
           Map<String, String> map = getQueryMap(query);
@@ -54,15 +57,20 @@ public class HTTPAsk {
 
         } // if statment to checkk if ask and get match
         else {
-          String response = "\nHTTP/1.1 400 BAD REQUEST\r\n\r\n";
+          String response = "\nHTTP/1.1 400 BAD REQUEST\r\n\r\n" + "HTTP/1.1 400 BAD REQUEST";
           cSocket.getOutputStream().write(response.getBytes("UTF-8"));
         }
 
-        fromClient.close();
+        //fromClient.close();
         cSocket.close();
+      }catch(Exception ex){
+        //if the TCPClient returns an exception
+        String response = "\nHTTP/1.1 404 NOT FOUND\r\n\r\n" + "\nHTTP/1.1 404 NOT FOUND";
+        cSocket.getOutputStream().write(response.getBytes("UTF-8"));
+      }
       }   // end of try that closes the socket
       }///end forever loop
-    }catch(IOException ex){
+    }catch(Exception ex){
           System.out.println(ex);
         }
 
