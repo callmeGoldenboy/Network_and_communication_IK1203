@@ -39,7 +39,7 @@ public class HTTPAsk {
           String url = "http://localhost:" + port + split[1];
           URL myUrl = new URL (url);
 
-          if(myUrl.getPath().equals("/ask") && method.equals("GET") && split[2].equals("HTTP/1.1")){
+          if(myUrl.getPath().equals("/ask") && method.equals("GET") && (split[2].equals("HTTP/1.1") || split[2].equals("HTTP/1.0"))){
           query = myUrl.getQuery();
           Map<String, String> map = getQueryMap(query);
           targetHost = map.get("hostname");
