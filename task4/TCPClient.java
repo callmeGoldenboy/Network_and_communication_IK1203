@@ -16,7 +16,7 @@ public class TCPClient {
 		int c = 0;
 		long current = System.currentTimeMillis();
         try{
-		while( (c = infromServer.read())!= -1){
+		while( (c = infromServer.read())!= -1 && (start - current)<3000){
 			current = System.currentTimeMillis();
 			fromServer += (char)c;
 		}

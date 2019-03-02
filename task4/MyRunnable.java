@@ -20,7 +20,6 @@ public class MyRunnable implements Runnable {
 
 	}
 
-
 	@Override
 	public void run() {
 		      try {
@@ -34,10 +33,10 @@ public class MyRunnable implements Runnable {
 	          String [] split = request.split(" ");
 	          //String [] split2 = split[1].split("?");
 	          String method = split[0];
-	          String url = "http://localhost:" + serverPort + split[1].toLowerCase();
+	          String url = "http://localhost:" + serverPort + split[1];
 	          URL myUrl = new URL (url);
 	          try{
-	          if(myUrl.getPath().equals("/ask") && method.equals("GET")){
+	          if(myUrl.getPath().equals("/ask") && method.equals("GET") && (split[2].equals("HTTP/1.1") || split[2].equals("HTTP/1.0"))){
 	          query = myUrl.getQuery();
 	          Map<String, String> map = getQueryMap(query);
 	          targetHost = map.get("hostname");
@@ -49,13 +48,12 @@ public class MyRunnable implements Runnable {
 	        }else {
 	            value = TCPClient.askServer(targetHost,targetPort);
 	        }
-	          String response =  "\nHTTP/1.1 200 OK \r\n\r\n" + value;
-	          System.out.println(response);
+	          String response =  "HTTP/1.1 200 OK \r\n\r\n" + value;
 	          cSocket.getOutputStream().write(response.getBytes("UTF-8"));
 
 	        } // if statment to checkk if ask and get match
 	        else {
-	          String response = "\nHTTP/1.1 400 BAD REQUEST\r\n\r\n" + "HTTP/1.1 400 BAD REQUEST";
+	          String response = "HTTP/1.1 400 Bad Request\r\n\r\n";
 	          cSocket.getOutputStream().write(response.getBytes("UTF-8"));
 	        }
 
@@ -63,12 +61,12 @@ public class MyRunnable implements Runnable {
 
 	      }catch(Exception ex){
 	        //if the TCPClient returns an exception
-	        String response = "\nHTTP/1.1 404 NOT FOUND\r\n\r\n" + "\nHTTP/1.1 404 NOT FOUND";
+	        String response = "HTTP/1.1 404 Not Found\r\n\r\n";
 	        cSocket.getOutputStream().write(response.getBytes("UTF-8"));
 	      }
 				 cSocket.close();
-	    }catch(IOException ex){
-	    	System.out.println("somthing went wrong");
+	    }catch(Exception ex){
+	    	System.out.println(ex);
 	    }
 	}
 	//helper function that returns a HashMap of key and values where keys are the string before = and values are the string after =
